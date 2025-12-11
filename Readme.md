@@ -1,18 +1,122 @@
-# RBAC Project Setup Guide (MySQL / PostgreSQL + Kafka + Docker)
+# 📌 RBAC Project (Spring Boot + MySQL/PostgreSQL + Kafka + Docker)
 
-This guide explains how to run the RBAC project using either:
+A **Role-Based Access Control (RBAC)** microservice implemented using **Java 21** and **Spring Boot**, with support for:
 
-- PostgreSQL (Local) + Kafka (Docker)
-- MySQL (Docker) + Kafka (Docker)
-
-Java Version → **Java 21**
+| Setup Option | Database | Kafka |
+|--------------|----------|-------|
+| 1 | PostgreSQL (Local) | Docker |
+| 2 | MySQL (Docker) | Docker |
 
 ---
 
-# 🚀 First Way – PostgreSQL (Local) + Kafka (Docker)
+## 🧠 Features
 
-## 1. application.yml (PostgreSQL Configuration)
+- Spring Boot (Java 21)
+- RBAC: Users, Roles
+- Kafka event streaming
+- MySQL or PostgreSQL support
+- Dockerized Kafka & Zookeeper
+- Clean enterprise-grade project structure
 
+---
+
+## 📁 Project Structure
+
+```text
+RBAC/
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── .gitignore
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/example/RBACUserManagement/
+│   │   │       ├── config/
+│   │   │       │   ├── DataInitializer
+│   │   │       │   ├── KafkaConfig
+│   │   │       │   └── SecurityConfig
+│   │   │       ├── controller/
+│   │   │       │   ├── AdminController
+│   │   │       │   ├── AuthController
+│   │   │       │   └── RoleController
+│   │   │       ├── dto/
+│   │   │       │   ├── AuthResponse
+│   │   │       │   ├── LoginResponse
+│   │   │       │   ├── RegisterRequest
+│   │   │       │   ├── RoleDto
+│   │   │       │   ├── UserProfileDto
+│   │   │       │   └── UserStatsDTO
+│   │   │       ├── exception/
+│   │   │       │   └── GlobalExceptionHandler
+│   │   │       ├── mapper/
+│   │   │       │   └── UserMapper
+│   │   │       ├── model/
+│   │   │       │   ├── Role
+│   │   │       │   └── User
+│   │   │       ├── repository/
+│   │   │       │   ├── RoleRepository
+│   │   │       │   └── UserRepository
+│   │   │       ├── security/
+│   │   │       │   ├── CustomUserDetailsService
+│   │   │       │   ├── JwtAuthenticationFilter
+│   │   │       │   └── Jwtservice
+│   │   │       ├── service/
+│   │   │       │   ├── AuthService
+│   │   │       │   ├── KafkaEventProducer
+│   │   │       │   ├── RoleService
+│   │   │       │   └── UserService
+│   │   │       └── RbacUserManagementApplication
+│   │   └── resources/
+│   │       ├── application.yml
+│   │       └── application-docker.yml
+└── README.md
+```
+
+
+---
+
+# ⚙️ Configuration Guide
+
+---
+
+# 🐘 1. PostgreSQL (Local) + Kafka (Docker)
+
+### application.yml
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rbacdb
+    username: your_pg_user
+    password: your_pg_password
+    driver-class-name: org.postgresql.Driver
+
+kafka:
+  bootstrap-servers: localhost:9092
+ 
+```
+### pom.xml
+Enable PostgreSQL driver:
+```xml
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+</dependency>
+
+<!--
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+</dependency>
+-->
+```
+---
+
+
+# 🐬 2. MySQL (Docker) + Kafka (Docker)
+
+### application.yml
 ```yaml
 spring:
   datasource:
@@ -25,35 +129,25 @@ kafka:
   bootstrap-servers: localhost:9092
 ```
 
-## 2. pom.xml Adjustments
-- ✔ Uncomment **PostgreSQL connector**
-- ❌ Comment **MySQL connector**
+### pom.xml
+Enable MySQL driver:
 
----
-
-# 🚀 Second Way – MySQL (Docker) + Kafka (Docker)
-
-## 1. pom.xml
-- ✔ MySQL driver **uncommented**
-- ❌ PostgreSQL driver **commented**
-
-## 2. application.yml (MySQL Configuration)
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/rbacdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: avnish
-    password: Avnish@2020
-    driver-class-name: com.mysql.cj.jdbc.Driver
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+</dependency>
+<!--
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+</dependency>
+-->
 ```
 
----
+# 🐳 Docker Setup
 
-# 🐳 Docker Commands
-
-## MySQL Container
-
+### MySQL Container
 ```bash
 docker run -d --name mysql-rbac \
   -e MYSQL_ROOT_PASSWORD=root \
@@ -63,10 +157,7 @@ docker run -d --name mysql-rbac \
   -p 3306:3306 mysql:8
 ```
 
----
-
-## Zookeeper
-
+### Zookeeper
 ```bash
 docker run -d --name=zookeeper \
   -p 2181:2181 \
@@ -74,10 +165,8 @@ docker run -d --name=zookeeper \
   confluentinc/cp-zookeeper:latest
 ```
 
----
 
-## Kafka
-
+### Kafka
 ```bash
 docker run -d --name=kafka \
   -p 9092:9092 \
@@ -89,54 +178,61 @@ docker run -d --name=kafka \
   confluentinc/cp-kafka:5.5.3
 ```
 
----
-
-## Start existing containers
-
+### Start Existing Containers
 ```bash
 docker start mysql-rbac
 docker start zookeeper
 docker start kafka
 ```
 
----
-
-# ▶ Run Spring Boot Application
-
+### ▶ Run Spring Boot Application
 ```bash
 mvn spring-boot:run
 ```
 
----
 
-# 🛢 Access MySQL in Docker
+OR build first:
 
-### Step 1 — Enter MySQL
-
+```bash
+mvn clean package
+java -jar target/rbac-*.jar
+```
+### 🛢 Access MySQL (Inside Docker)
+Enter Container
 ```bash
 docker exec -it mysql-rbac mysql -u avnish -p
 ```
-
-### Step 2 — Enter password
-
-```
+```css
 Avnish@2020
 ```
-
-### Step 3 — Select database
-
+Select Database
 ```sql
 USE rbacdb;
 ```
 
-### Step 4 — Show tables
-
 ```sql
+List Tables
+
 SHOW TABLES;
 ```
 
----
+### 🧪 Optional: Create Kafka Topic
+```bash
+kafka-topics --create \
+  --bootstrap-server localhost:9092 \
+  --replication-factor 1 \
+  --partitions 1 \
+  --topic your_topic
+```
 
-# 🎉 Done!
+### 🧾 Best Practices
+Use Spring profiles (application-docker.yml, application-local.yml)
 
-You can now work with this project using PostgreSQL or MySQL + Kafka + Docker.
+Use Flyway/Liquibase for schema management
+
+Add initial roles,user using Datainitializer file
+
+Implemented JWT-based security for protecting endpoints
+
+🎉 Done!
+Your RBAC system with PostgreSQL / MySQL + Kafka + Docker is now ready to run.
