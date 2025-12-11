@@ -68,7 +68,7 @@ RBAC/
 │   │   │       │   └── UserService
 │   │   │       └── RbacUserManagementApplication
 │   │   └── resources/
-│   │       ├── application.yml
+│   │       ├── application-local.yml
 │   │       └── application-docker.yml
 └── README.md
 ```
@@ -82,7 +82,7 @@ RBAC/
 
 # 🐘 1. PostgreSQL (Local) + Kafka (Docker)
 
-### application.yml
+### application-local.yml
 
 ```yaml
 spring:
@@ -116,7 +116,7 @@ Enable PostgreSQL driver:
 
 # 🐬 2. MySQL (Docker) + Kafka (Docker)
 
-### application.yml
+### application-docker.yml
 ```yaml
 spring:
   datasource:
