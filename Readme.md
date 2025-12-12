@@ -126,6 +126,15 @@ or
 docker-compose up --build
 ```
 
+### Default Login Credentials
+
+```text
+admin@example.com
+adminpassword
+
+Role - Admin
+```
+
 
 # 🐳 Docker Setup
 
